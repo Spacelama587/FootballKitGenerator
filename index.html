@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football Kit Designer</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            display: flex;
+            gap: 40px;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .controls {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .preview {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: white;
+        }
+
+        .color-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="color"] {
+            width: 50px;
+            height: 40px;
+            padding: 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 80px;
+        }
+
+        canvas {
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Football Kit Designer</h1>
+    <div class="container">
+        <div class="controls">
+            <div class="control-group">
+                <label for="style">Kit Style:</label>
+                <select id="style">
+                    <option value="plain">Plain</option>
+                    <option value="halves">Half & Half</option>
+                    <option value="stripes">Vertical Stripes</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Primary Color:</label>
+                <div class="color-input">
+                    <input type="color" id="primaryColor" value="#ff0000">
+                    <input type="text" id="primaryColorHex" value="#ff0000">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Secondary Color:</label>
+                <div class="color-input">
+                    <input type="color" id="secondaryColor" value="#ffffff">
+                    <input type="text" id="secondaryColorHex" value="#ffffff">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Shorts Color:</label>
+                <div class="color-input">
+                    <input type="color" id="shortsColor" value="#000000">
+                    <input type="text" id="shortsColorHex" value="#000000">
+                </div>
+            </div>
+
+            <div class="info">
+                Changes are applied automatically. All colors can be input either using 
+                the color picker or by typing the hex code directly.
+            </div>
+        </div>
+
+        <div class="preview">
+            <canvas id="kitCanvas"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Previous FootballKitGenerator class code
+        class FootballKitGenerator {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                
+                // Set default canvas size
+                this.canvas.width = 120;
+                this.canvas.height = 160;
+            }
+
+            clear() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+
+            drawKit({
+                style = 'plain',
+                primaryColor = '#ff0000',
+                secondaryColor = '#ffffff',
+                shortsColor = '#000000',
+                borderColor = '#000000'
+            }) {
+                this.clear();
+                
+                switch (style) {
+                    case 'halves':
+                        this.drawHalvesShirt(primaryColor, secondaryColor, borderColor);
+                        break;
+                    case 'stripes':
+                        this.drawStripedShirt(primaryColor, secondaryColor, borderColor);
+                        break;
+                    case 'plain':
+                        this.drawPlainShirt(primaryColor, secondaryColor, borderColor);
+                        break;
+                }
+
+                this.drawShorts(shortsColor, borderColor);
+                this.drawBadge();
+            }
+
+            drawPlainShirt(mainColor, trimColor, borderColor) {
+                this.ctx.beginPath();
+                
+                // Shirt body
+                this.ctx.moveTo(30, 20);
+                this.ctx.lineTo(90, 20);
+                this.ctx.lineTo(90, 80);
+                this.ctx.lineTo(30, 80);
+                this.ctx.closePath();
+                
+                // Sleeves
+                this.ctx.moveTo(30, 20);
+                this.ctx.lineTo(15, 40);
+                this.ctx.lineTo(30, 40);
+                this.ctx.moveTo(90, 20);
+                this.ctx.lineTo(105, 40);
+                this.ctx.lineTo(90, 40);
+                
+                this.ctx.fillStyle = mainColor;
+                this.ctx.fill();
+                this.ctx.strokeStyle = borderColor;
+                this.ctx.stroke();
+                
+                if (trimColor) {
+                    this.ctx.strokeStyle = trimColor;
+                    this.ctx.lineWidth = 3;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(15, 38);
+                    this.ctx.lineTo(30, 38);
+                    this.ctx.moveTo(90, 38);
+                    this.ctx.lineTo(105, 38);
+                    this.ctx.stroke();
+                    this.ctx.lineWidth = 1;
+                }
+            }
+
+            drawHalvesShirt(color1, color2, borderColor) {
+                // Left half
+                this.ctx.beginPath();
+                this.ctx.moveTo(30, 20);
+                this.ctx.lineTo(60, 20);
+                this.ctx.lineTo(60, 80);
+                this.ctx.lineTo(30, 80);
+                this.ctx.lineTo(15, 40);
+                this.ctx.lineTo(30, 40);
+                this.ctx.closePath();
+                this.ctx.fillStyle = color1;
+                this.ctx.fill();
+                
+                // Right half
+                this.ctx.beginPath();
+                this.ctx.moveTo(60, 20);
+                this.ctx.lineTo(90, 20);
+                this.ctx.lineTo(105, 40);
+                this.ctx.lineTo(90, 40);
+                this.ctx.lineTo(90, 80);
+                this.ctx.lineTo(60, 80);
+                this.ctx.closePath();
+                this.ctx.fillStyle = color2;
+                this.ctx.fill();
+                
+                this.ctx.strokeStyle = borderColor;
+                this.ctx.strokeRect(30, 20, 60, 60);
+                this.drawSleeveBorders(borderColor);
+            }
+
+            drawStripedShirt(color1, color2, borderColor) {
+                const stripeWidth = 12;
+                
+                this.drawPlainShirt(color1, null, borderColor);
+                
+                this.ctx.fillStyle = color2;
+                for (let x = 30; x < 90; x += stripeWidth * 2) {
+                    this.ctx.fillRect(x, 20, stripeWidth, 60);
+                }
+                
+                this.ctx.strokeStyle = borderColor;
+                this.ctx.strokeRect(30, 20, 60, 60);
+                this.drawSleeveBorders(borderColor);
+            }
+
+            drawShorts(color, borderColor) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(40, 90);
+                this.ctx.lineTo(80, 90);
+                this.ctx.lineTo(85, 120);
+                this.ctx.lineTo(35, 120);
+                this.ctx.closePath();
+                
+                this.ctx.fillStyle = color;
+                this.ctx.fill();
+                this.ctx.strokeStyle = borderColor;
+                this.ctx.stroke();
+            }
+
+            drawSleeveBorders(color) {
+                this.ctx.strokeStyle = color;
+                this.ctx.beginPath();
+                this.ctx.moveTo(30, 20);
+                this.ctx.lineTo(15, 40);
+                this.ctx.lineTo(30, 40);
+                this.ctx.moveTo(90, 20);
+                this.ctx.lineTo(105, 40);
+                this.ctx.lineTo(90, 40);
+                this.ctx.stroke();
+            }
+
+            drawBadge() {
+                // Draw three dots
+                this.ctx.fillStyle = '#ffffff';
+                for (let i = 0; i < 3; i++) {
+                    this.ctx.beginPath();
+                    this.ctx.arc(45 + (i * 5), 30, 1.5, 0, Math.PI * 2);
+                    this.ctx.fill();
+                }
+                
+                // Draw shield outline
+                this.ctx.beginPath();
+                this.ctx.moveTo(40, 25);
+                this.ctx.lineTo(55, 25);
+                this.ctx.lineTo(55, 35);
+                this.ctx.lineTo(47.5, 40);
+                this.ctx.lineTo(40, 35);
+                this.ctx.closePath();
+                this.ctx.strokeStyle = '#ffffff';
+                this.ctx.stroke();
+            }
+        }
+
+        // Initialize the kit generator
+        const canvas = document.getElementById('kitCanvas');
+        const generator = new FootballKitGenerator(canvas);
+
+        // Get all control elements
+        const styleSelect = document.getElementById('style');
+        const primaryColorInput = document.getElementById('primaryColor');
+        const secondaryColorInput = document.getElementById('secondaryColor');
+        const shortsColorInput = document.getElementById('shortsColor');
+        const primaryColorHex = document.getElementById('primaryColorHex');
+        const secondaryColorHex = document.getElementById('secondaryColorHex');
+        const shortsColorHex = document.getElementById('shortsColorHex');
+
+        // Function to update the kit
+        function updateKit() {
+            generator.drawKit({
+                style: styleSelect.value,
+                primaryColor: primaryColorInput.value,
+                secondaryColor: secondaryColorInput.value,
+                shortsColor: shortsColorInput.value
+            });
+        }
+
+        // Function to update hex input when color picker changes
+        function updateHexInput(colorInput, hexInput) {
+            hexInput.value = colorInput.value;
+        }
+
+        // Function to update color picker when hex input changes
+        function updateColorInput(hexInput, colorInput) {
+            if (/^#[0-9A-F]{6}$/i.test(hexInput.value)) {
+                colorInput.value = hexInput.value;
+                updateKit();
+            }
+        }
+
+        // Add event listeners
+        styleSelect.addEventListener('change', updateKit);
+        primaryColorInput.addEventListener('input', () => {
+            updateHexInput(primaryColorInput, primaryColorHex);
+            updateKit();
+        });
+        secondaryColorInput.addEventListener('input', () => {
+            updateHexInput(secondaryColorInput, secondaryColorHex);
+            updateKit();
+        });
+        shortsColorInput.addEventListener('input', () => {
+            updateHexInput(shortsColorInput, shortsColorHex);
+            updateKit();
+        });
+
+        primaryColorHex.addEventListener('input', () => updateColorInput(primaryColorHex, primaryColorInput));
+        secondaryColorHex.addEventListener('input', () => updateColorInput(secondaryColorHex, secondaryColorInput));
+        shortsColorHex.addEventListener('input', () => updateColorInput(shortsColorHex, shortsColorInput));
+
+        // Initial render
+        updateKit();
+    </script>
+</body>
+</html>
